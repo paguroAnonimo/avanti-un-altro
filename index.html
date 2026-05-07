@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avanti un Altro - Il Gioco Finale</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b132b;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: box-shadow 0.2s ease-in-out;
+            box-sizing: border-box;
+            user-select: none; 
+            -webkit-user-select: none; /* Indispensabile per iPhone/Safari */
+        }
+
+        .flash-green { box-shadow: inset 0 0 40px 15px #8ac926; }
+        .flash-red { box-shadow: inset 0 0 40px 15px #ff595e; }
+
+        .container {
+            background-color: #1c2541;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 90%;
+            z-index: 10;
+        }
+        h1 { color: #fca311; }
+        .input-group { margin: 20px 0; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 1.2em; }
+        .input-group input {
+            font-size: 1.2em;
+            padding: 10px;
+            width: 80%;
+            max-width: 200px;
+            text-align: center;
+            border-radius: 5px;
+            border: none;
+        }
+        
+        button {
+            background-color: #3a506b;
+            color: white;
+            border: 2px solid #5bc0be;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.2s, color 0.2s;
+            touch-action: manipulation;
+        }
+        button:hover:not(:disabled) { 
+            background-color: #5bc0be; 
+            color: #0b132b; 
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+        .btn-answer { width: 45%; min-width: 200px; }
+        
+        .btn-exit {
+            background-color: #ff595e;
+            border-color: #ff595e;
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 30px;
+        }
+        .btn-exit:hover:not(:disabled) {
+            background-color: #c93b40;
+            border-color: #c93b40;
+            color: white;
+        }
+
+        #game-screen, #end-screen { display: none; }
+        
+        #timer { font-size: 3em; font-weight: bold; color: #ff595e; margin: 10px 0; }
+        #progress { font-size: 1.5em; color: #8ac926; margin-bottom: 10px; }
+        
+        /* Stili per la barra di progresso (i cerchi) */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        .circle {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #4a5d85; /* Grigio di base */
+            transition: background-color 0.3s;
+        }
+        .circle.green { background-color: #8ac926; }
+        .circle.red { background-color: #ff595e; }
+
+        #question { font-size: 1.8em; margin-bottom: 30px; min-height: 80px; }
+        
+        .answers-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Stili per il titolo con immagine */
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Spazio tra la scritta e l'immagine */
+        }
+
+        .title-image {
+            width: 100px; /* Larghezza dell'immagine */
+            height: 100px; /* Altezza dell'immagine */
+            border-radius: 50%; /* Questo la rende un cerchio perfetto */
+            object-fit: cover; /* Evita che l'immagine si deformi o si schiacci */
+            border: 2px solid #fca311; /* Un bordino arancione per abbinarla al titolo (opzionale) */
+        }
+
+        /* Contenitore per allineare Timer e GIF */
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        /* Modifichiamo leggermente il timer per adattarlo al contenitore */
+        #timer { 
+            font-size: 3em; 
+            font-weight: bold; 
+            color: #ff595e; 
+            margin: 0; 
+        }
+
+        /* Stile per la GIF */
+        #panic-gif {
+            width: 50%; /* Scegli tu la grandezza */
+            height: 25%; /* Scegli tu la grandezza */
+            border-radius: 10px; /* Un po' di smussatura, opzionale */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCHERMATA DI CONFIGURAZIONE -->
+    <div id="setup-screen" class="container">
+        <div class="title-container">
+            <h1>CAPOBRANCO dei paguri</h1>
+            <img src="capobranco.jfif" alt="Immagine del titolo" class="title-image">
+        </div>
+        <p>Devi dare la risposta <strong>SBAGLIATA</strong> per andare avanti!</p>
+        
+        <div class="input-group">
+            <label for="playerName">Il tuo nome:</label>
+            <input type="text" id="playerName" placeholder="Es. Mario">
+        </div>
+
+        <div class="input-group">
+            <label for="timeLimit">Secondi a disposizione:</label>
+            <input type="number" id="timeLimit" value="150">
+        </div>
+        
+        <div class="input-group">
+            <label for="targetQuestions">Domande per vincere:</label>
+            <input type="number" id="targetQuestions" value="21">
+        </div>
+        
+        <button onclick="startGame()">Inizia la Partita</button>
+    </div>
+
+    <!-- SCHERMATA DI GIOCO -->
+    <div id="game-screen" class="container">
+        <!-- NUOVO CONTENITORE TIMER + GIF -->
+        <div class="timer-container">
+            <div id="timer">150</div>
+            <!-- Sostituisci "ansia.gif" con il nome reale del tuo file -->
+            <img id="panic-gif" src="capobranco_ultima.gif" alt="Manca poco!" style="display: none;">
+        </div>
+        <div id="progress">Domanda 1 di 21</div>
+        
+        <!-- BARRA DI PROGRESSO CON I CERCHI -->
+        <div id="progress-bar" class="progress-bar"></div>
+
+        <div id="question">Qui andrà la domanda...</div>
+        <div class="answers-container">
+            <button id="btn1" class="btn-answer" onclick="checkAnswer(1)"></button>
+            <button id="btn2" class="btn-answer" onclick="checkAnswer(2)"></button>
+        </div>
+        <button class="btn-exit" onclick="confirmExit()">Termina Partita</button>
+    </div>
+
+    <!-- SCHERMATA DI FINE GIOCO -->
+    <div id="end-screen" class="container">
+        <div class="title-container">
+            <h1 id="end-title">Risultato</h1>
+            <!-- Inizialmente nascosta per non mostrare un quadratino vuoto -->
+            <img id="end-image" src="" alt="Risultato" class="title-image" style="display: none;">
+        </div>
+        <p id="end-message"></p>
+        <button onclick="location.reload()">Torna alla Home</button>
+    </div>
+
+    <script>
+        const questionsDB = [
+            { q: "Di che colore è il cavallo bianco di Napoleone?", true_ans: "Bianco", false_ans: "Nero" },
+            { q: "Quanti giorni ha una settimana?", true_ans: "Sette", false_ans: "Cinque" },
+            { q: "La capitale dell'Italia è...", true_ans: "Roma", false_ans: "Milano" },
+            { q: "Il sole sorge ad...", true_ans: "Est", false_ans: "Ovest" },
+            { q: "L'acqua bolle a quanti gradi?", true_ans: "Cento", false_ans: "Novanta" },
+            { q: "Qual è il mese più corto dell'anno?", true_ans: "Febbraio", false_ans: "Marzo" },
+            { q: "Come si chiama il nostro satellite naturale?", true_ans: "Luna", false_ans: "Marte" },
+            { q: "Chi ha dipinto la Gioconda?", true_ans: "Leonardo", false_ans: "Picasso" },
+            { q: "Quanti sono i Re Magi?", true_ans: "Tre", false_ans: "Quattro" },
+            { q: "Il ghiaccio è acqua allo stato...", true_ans: "Solido", false_ans: "Gassoso" },
+            { q: "La lingua parlata in Spagna è lo...", true_ans: "Spagnolo", false_ans: "Francese" },
+            { q: "Un triangolo ha quanti lati?", true_ans: "Tre", false_ans: "Quattro" },
+            { q: "Il verso del cane è il...", true_ans: "Latrato", false_ans: "Miagolio" },
+            { q: "Quale animale ha la proboscide?", true_ans: "Elefante", false_ans: "Giraffa" },
+            { q: "In che stagione cade il Natale?", true_ans: "Inverno", false_ans: "Estate" },
+            { q: "Cosa si usa per tagliare la carta?", true_ans: "Forbici", false_ans: "Cucchiaio" },
+            { q: "Il pomodoro è di colore...", true_ans: "Rosso", false_ans: "Blu" },
+            { q: "Chi è l'eterno nemico di Batman?", true_ans: "Joker", false_ans: "Lex Luthor" },
+            { q: "Quanti minuti ci sono in un'ora?", true_ans: "Sessanta", false_ans: "Cento" },
+            { q: "L'America fu scoperta da...", true_ans: "Colombo", false_ans: "Vespucci" },
+            { q: "Il pianeta più vicino al sole è...", true_ans: "Mercurio", false_ans: "Terra" },
+            { q: "Quale uccello non sa volare?", true_ans: "Pinguino", false_ans: "Passero" },
+            { q: "Dove si trova il Colosseo?", true_ans: "Roma", false_ans: "Napoli" }
+        ];
+
+        let playerName = "Giocatore"; 
+        let timeLeft;
+        let targetQuestions;
+        let currentIndex = 0;
+        let timerInterval;
+        let currentWinningButton = 1; 
+        let currentGameQuestions = [];
+        
+        // Nuova variabile per tenere traccia del record massimo della partita corrente
+        let maxConsecutiveCorrect = 0;
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function startGame() {
+            let inputName = document.getElementById('playerName').value.trim();
+            if (inputName !== "") {
+                playerName = inputName;
+            }
+
+            timeLeft = parseInt(document.getElementById('timeLimit').value) || 150;
+            targetQuestions = parseInt(document.getElementById('targetQuestions').value) || 21;
+            
+            if (targetQuestions > questionsDB.length) {
+                targetQuestions = questionsDB.length;
+            }
+
+            currentGameQuestions = shuffleArray(questionsDB).slice(0, targetQuestions);
+            currentIndex = 0;
+            maxConsecutiveCorrect = 0;
+
+            // Generazione dei cerchi per la barra di progresso
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.innerHTML = ''; // Svuota la barra se si fa una nuova partita
+            for (let i = 0; i < targetQuestions; i++) {
+                let circle = document.createElement('div');
+                circle.className = 'circle';
+                progressBar.appendChild(circle);
+            }
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+
+            updateTimerDisplay();
+            timerInterval = setInterval(countdown, 1000);
+            loadQuestion();
+        }
+
+        function countdown() {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
+                endGame(false);
+            }
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timer').innerText = timeLeft;
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= targetQuestions) {
+                endGame(true);
+                return;
+            }
+
+            document.getElementById('progress').innerText = `Domanda ${currentIndex + 1} di ${targetQuestions}`;
+            
+            // --- GESTIONE DELLA GIF FINALE ---
+            const panicGif = document.getElementById('panic-gif');
+            // Se mancano 2 o meno domande alla fine (es. siamo alla 19 su 21)
+            if (targetQuestions - currentIndex <= 2) {
+                panicGif.style.display = 'block'; // Mostra la GIF
+            } else {
+                panicGif.style.display = 'none';  // Nasconde la GIF
+            }
+
+            const qData = currentGameQuestions[currentIndex];
+            document.getElementById('question').innerText = qData.q;
+
+            const isReversed = Math.random() > 0.5;
+            const btn1 = document.getElementById('btn1');
+            const btn2 = document.getElementById('btn2');
+
+            if (isReversed) {
+                btn1.innerText = qData.false_ans; 
+                btn2.innerText = qData.true_ans;  
+                currentWinningButton = 1;
+            } else {
+                btn1.innerText = qData.true_ans;  
+                btn2.innerText = qData.false_ans; 
+                currentWinningButton = 2;
+            }
+        }
+
+        function checkAnswer(selectedButton) {
+            const btn1 = document.getElementById('btn1');
+            const btn2 = document.getElementById('btn2');
+            const clickedBtn = selectedButton === 1 ? btn1 : btn2;
+            
+            // Prendiamo tutti i cerchi della barra
+            const circles = document.querySelectorAll('.circle');
+
+            btn1.disabled = true;
+            btn2.disabled = true;
+
+            const isCorrect = (selectedButton === currentWinningButton);
+
+            // Applica stili visivi e colori ai cerchi immediatamente
+            if (isCorrect) {
+                clickedBtn.style.backgroundColor = '#8ac926'; 
+                clickedBtn.style.borderColor = '#8ac926';
+                document.body.classList.add('flash-green');
+                
+                circles[currentIndex].classList.remove('red'); // Rimuove il rosso se c'era prima
+                circles[currentIndex].classList.add('green');  // Lo colora di verde
+            } else {
+                clickedBtn.style.backgroundColor = '#ff595e'; 
+                clickedBtn.style.borderColor = '#ff595e';
+                document.body.classList.add('flash-red');
+                
+                circles[currentIndex].classList.add('red'); // Colora di rosso il cerchio dell'errore
+            }
+
+            setTimeout(() => {
+                clickedBtn.style.backgroundColor = '';
+                clickedBtn.style.borderColor = '';
+                document.body.classList.remove('flash-green', 'flash-red');
+                btn1.disabled = false;
+                btn2.disabled = false;
+
+                if (timeLeft <= 0) return;
+
+                if (isCorrect) {
+                    currentIndex++;
+                    // Aggiorniamo il record se l'indice attuale è maggiore di quello salvato in precedenza
+                    if (currentIndex > maxConsecutiveCorrect) {
+                        maxConsecutiveCorrect = currentIndex;
+                    }
+                    loadQuestion();
+                } else {
+                    // SE SBAGLIA:
+                    const failedIndex = currentIndex;
+                    
+                    // Riporta i cerchi verdi a grigi e toglie i vecchi rossi (tranne l'ultimo errore commesso)
+                    circles.forEach((c, idx) => {
+                        c.classList.remove('green');
+                        if (idx !== failedIndex) {
+                            c.classList.remove('red');
+                        }
+                    });
+                    
+                    currentIndex = 0; 
+                    loadQuestion();
+                }
+            }, 300);
+        }
+
+        function confirmExit() {
+            clearInterval(timerInterval);
+            const wantToExit = confirm(`${playerName}, sei sicuro di voler abbandonare la partita in corso?`);
+            if (wantToExit) {
+                location.reload();
+            } else {
+                timerInterval = setInterval(countdown, 1000);
+            }
+        }
+
+        function endGame(isWin) {
+            clearInterval(timerInterval);
+            document.body.classList.remove('flash-green', 'flash-red');
+            
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'block';
+
+            const title = document.getElementById('end-title');
+            const message = document.getElementById('end-message');
+            const endImage = document.getElementById('end-image'); // Seleziona l'immagine
+
+            // Rende l'immagine visibile
+            endImage.style.display = 'block'; 
+
+            if (isWin) {
+                title.innerText = "HAI VINTO!";
+                title.style.color = "#8ac926";
+                message.innerText = `Ben fatto ${playerName}! Hai completato le ${targetQuestions} domande con ${timeLeft} secondi di anticipo.`;
+                
+                // --- IMMAGINE VITTORIA ---
+                endImage.src = "capobranco_vittoria.webp"; // <-- Sostituisci con il file/link della tua immagine per la vittoria
+                endImage.style.borderColor = "#8ac926"; // Rende il bordino verde
+                
+            } else {
+                title.innerText = "TEMPO SCADUTO!";
+                title.style.color = "#ff595e";
+                message.innerText = `Peccato ${playerName}! Il tuo record in questa partita è stato di ${maxConsecutiveCorrect} risposte esatte.`;
+                
+                // --- IMMAGINE SCONFITTA ---
+                endImage.src = "capobranco_sconfitta.jpg"; // <-- Sostituisci con il file/link della tua immagine per la sconfitta
+                endImage.style.borderColor = "#ff595e"; // Rende il bordino rosso
+            }
+        }
+    </script>
+</body>
+</html>
