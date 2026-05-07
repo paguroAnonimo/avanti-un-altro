@@ -60,9 +60,11 @@
             transition: background-color 0.2s, color 0.2s;
             touch-action: manipulation;
         }
-        button:hover:not(:disabled) { 
-            background-color: #5bc0be; 
-            color: #0b132b; 
+        @media (hover: hover) {
+            button:hover:not(:disabled) { 
+                background-color: #5bc0be; 
+                color: #0b132b; 
+            }
         }
         button:disabled {
             cursor: not-allowed;
@@ -218,29 +220,29 @@
 
     <script>
         const questionsDB = [
-            { q: "Di che colore è il cavallo bianco di Napoleone?", true_ans: "Bianco", false_ans: "Nero" },
-            { q: "Quanti giorni ha una settimana?", true_ans: "Sette", false_ans: "Cinque" },
-            { q: "La capitale dell'Italia è...", true_ans: "Roma", false_ans: "Milano" },
-            { q: "Il sole sorge ad...", true_ans: "Est", false_ans: "Ovest" },
-            { q: "L'acqua bolle a quanti gradi?", true_ans: "Cento", false_ans: "Novanta" },
-            { q: "Qual è il mese più corto dell'anno?", true_ans: "Febbraio", false_ans: "Marzo" },
-            { q: "Come si chiama il nostro satellite naturale?", true_ans: "Luna", false_ans: "Marte" },
-            { q: "Chi ha dipinto la Gioconda?", true_ans: "Leonardo", false_ans: "Picasso" },
-            { q: "Quanti sono i Re Magi?", true_ans: "Tre", false_ans: "Quattro" },
-            { q: "Il ghiaccio è acqua allo stato...", true_ans: "Solido", false_ans: "Gassoso" },
-            { q: "La lingua parlata in Spagna è lo...", true_ans: "Spagnolo", false_ans: "Francese" },
-            { q: "Un triangolo ha quanti lati?", true_ans: "Tre", false_ans: "Quattro" },
-            { q: "Il verso del cane è il...", true_ans: "Latrato", false_ans: "Miagolio" },
-            { q: "Quale animale ha la proboscide?", true_ans: "Elefante", false_ans: "Giraffa" },
-            { q: "In che stagione cade il Natale?", true_ans: "Inverno", false_ans: "Estate" },
-            { q: "Cosa si usa per tagliare la carta?", true_ans: "Forbici", false_ans: "Cucchiaio" },
-            { q: "Il pomodoro è di colore...", true_ans: "Rosso", false_ans: "Blu" },
-            { q: "Chi è l'eterno nemico di Batman?", true_ans: "Joker", false_ans: "Lex Luthor" },
-            { q: "Quanti minuti ci sono in un'ora?", true_ans: "Sessanta", false_ans: "Cento" },
-            { q: "L'America fu scoperta da...", true_ans: "Colombo", false_ans: "Vespucci" },
-            { q: "Il pianeta più vicino al sole è...", true_ans: "Mercurio", false_ans: "Terra" },
-            { q: "Quale uccello non sa volare?", true_ans: "Pinguino", false_ans: "Passero" },
-            { q: "Dove si trova il Colosseo?", true_ans: "Roma", false_ans: "Napoli" }
+            { q: "Bianco o Nero, di che colore è il cavallo bianco di Napoleone?", true_ans: "Bianco", false_ans: "Nero" },
+            { q: "Sette o Cinque, quanti giorni ha una settimana?", true_ans: "Sette", false_ans: "Cinque" },
+            { q: "Roma o Milano, qual è la capitale dell'Italia?", true_ans: "Roma", false_ans: "Milano" },
+            { q: "Est o Ovest, dove sorge il sole?", true_ans: "Est", false_ans: "Ovest" },
+            { q: "Cento o Novanta, a quanti gradi bolle l'acqua?", true_ans: "Cento", false_ans: "Novanta" },
+            { q: "Febbraio o Marzo, qual è il mese più corto dell'anno?", true_ans: "Febbraio", false_ans: "Marzo" },
+            { q: "Luna o Marte, come si chiama il nostro satellite naturale?", true_ans: "Luna", false_ans: "Marte" },
+            { q: "Leonardo o Picasso, chi ha dipinto la Gioconda?", true_ans: "Leonardo", false_ans: "Picasso" },
+            { q: "Tre o Quattro, quanti sono i Re Magi?", true_ans: "Tre", false_ans: "Quattro" },
+            { q: "Solido o Gassoso, il ghiaccio è acqua allo stato...?", true_ans: "Solido", false_ans: "Gassoso" },
+            { q: "Spagnolo o Francese, che lingua si parla in Spagna?", true_ans: "Spagnolo", false_ans: "Francese" },
+            { q: "Tre o Quattro, quanti lati ha un triangolo?", true_ans: "Tre", false_ans: "Quattro" },
+            { q: "Latrato o Miagolio, qual è il verso del cane?", true_ans: "Latrato", false_ans: "Miagolio" },
+            { q: "Elefante o Giraffa, quale animale ha la proboscide?", true_ans: "Elefante", false_ans: "Giraffa" },
+            { q: "Inverno o Estate, in che stagione cade il Natale?", true_ans: "Inverno", false_ans: "Estate" },
+            { q: "Forbici o Cucchiaio, cosa si usa per tagliare la carta?", true_ans: "Forbici", false_ans: "Cucchiaio" },
+            { q: "Rosso o Blu, di che colore è il pomodoro maturo?", true_ans: "Rosso", false_ans: "Blu" },
+            { q: "Joker o Lex Luthor, chi è l'eterno nemico di Batman?", true_ans: "Joker", false_ans: "Lex Luthor" },
+            { q: "Sessanta o Cento, quanti minuti ci sono in un'ora?", true_ans: "Sessanta", false_ans: "Cento" },
+            { q: "Colombo o Vespucci, da chi fu scoperta l'America?", true_ans: "Colombo", false_ans: "Vespucci" },
+            { q: "Mercurio o Terra, qual è il pianeta più vicino al sole?", true_ans: "Mercurio", false_ans: "Terra" },
+            { q: "Pinguino o Passero, quale di questi uccelli non sa volare?", true_ans: "Pinguino", false_ans: "Passero" },
+            { q: "Roma o Napoli, dove si trova il Colosseo?", true_ans: "Roma", false_ans: "Napoli" }
         ];
 
         let playerName = "Giocatore"; 
@@ -380,6 +382,8 @@
                 document.body.classList.remove('flash-green', 'flash-red');
                 btn1.disabled = false;
                 btn2.disabled = false;
+
+                clickedBtn.blur();
 
                 if (timeLeft <= 0) return;
 
